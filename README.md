@@ -161,6 +161,11 @@ We recommend that you always enable `core` tools so that you can fetch project l
 
 > By default all domains are loaded
 
+## 🧩 Optional Components
+
+- `azure-devops-mcp-bridge`: Docker-based HTTP(S) bridge with API key auth. See
+  [`azure-devops-mcp-bridge/README.md`](./azure-devops-mcp-bridge/README.md).
+
 ## 📝 Troubleshooting
 
 See the [Troubleshooting guide](./docs/TROUBLESHOOTING.md) for help with common issues and logging.

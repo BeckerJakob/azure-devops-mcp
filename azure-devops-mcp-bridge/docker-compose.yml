@@ -1,0 +1,49 @@
+services:
+  mcp:
+    build:
+      context: .
+      args:
+        ADO_MCP_REF: ${ADO_MCP_REF:-v2.4.0}
+    restart: unless-stopped
+    environment:
+      ADO_ORG: ${ADO_ORG}
+      ADO_MCP_AUTH_TOKEN: ${ADO_MCP_AUTH_TOKEN}
+      MCP_API_KEY: ${MCP_API_KEY}
+      ADO_DOMAINS: ${ADO_DOMAINS:-all}
+      ADO_AUTH_TYPE: ${ADO_AUTH_TYPE:-envvar}
+      PORT: 3000
+    expose:
+      - "3000"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp
+      - /home/node
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - mcp
+    environment:
+      DOMAIN: ${DOMAIN}
+      CADDYFILE: |
+        {$$DOMAIN} {
+          reverse_proxy mcp:3000
+        }
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    command: >
+      /bin/sh -c 'printf "%s" "$$CADDYFILE" > /etc/caddy/Caddyfile
+      && caddy run --config /etc/caddy/Caddyfile --adapter caddyfile'
+
+volumes:
+  caddy_data:
+  caddy_config:
